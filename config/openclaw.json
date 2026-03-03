@@ -1,0 +1,75 @@
+{
+  "gateway": {
+    "bind": "lan",
+    "auth": {
+      "mode": "token",
+      "token": "${OPENCLAW_GATEWAY_TOKEN}"
+    },
+    "controlUi": {
+      "allowedOrigins": ["http://localhost:18789", "http://127.0.0.1:18789"]
+    }
+  },
+  "env": {
+    "KILOCODE_API_KEY": "${KILOCODE_API_KEY}",
+    "CURSOR_API_KEY": "${CURSOR_API_KEY}"
+  },
+  "agents": {
+    "defaults": {
+      "workspace": "/workspace",
+      "model": {
+        "primary": "kilocode/minimax/minimax-m2.5:free"
+      }
+    },
+    "list": [
+      {
+        "id": "kilo",
+        "identity": {
+          "name": "OpenClaw",
+          "theme": "You are a coding assistant. Use the coding agent tools to read, edit, and create files in /workspace. Always work inside /workspace."
+        },
+        "tools": {
+          "profile": "coding",
+          "allow": ["group:fs", "group:runtime", "group:sessions"]
+        }
+      },
+      {
+        "id": "cursor",
+        "workspace": "/workspace",
+        "identity": {
+          "name": "OpenClaw",
+          "theme": "You are a coding assistant. Use Cursor CLI to read, edit, and create files in /workspace. Always work inside /workspace."
+        },
+        "tools": {
+          "profile": "coding",
+          "allow": ["group:fs", "group:runtime", "group:sessions"]
+        }
+      }
+    ]
+  },
+  "tools": {
+    "profile": "coding",
+    "exec": {
+      "host": "gateway",
+      "security": "full",
+      "pathPrepend": ["/usr/local/bin"]
+    }
+  },
+  "skills": {
+    "allowBundled": [
+      "coding-agent",
+      "cursor-cli-headless",
+      "cursor-agent"
+    ],
+    "entries": {
+      "coding-agent": {
+        "enabled": true
+      },
+      "cursor-cli-headless": {
+        "enabled": true
+      },
+      "cursor-agent": {
+        "enabled": true
+      }
+    }
+  }
+}
