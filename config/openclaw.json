@@ -15,7 +15,7 @@
   },
   "agents": {
     "defaults": {
-      "workspace": "/workspace",
+      "workspace": "/home/node/.openclaw/workspace",
       "model": {
         "primary": "kilocode/minimax/minimax-m2.5:free"
       }
@@ -25,7 +25,7 @@
         "id": "kilo",
         "identity": {
           "name": "OpenClaw",
-          "theme": "You are a coding assistant. Use the coding agent tools to read, edit, and create files in /workspace. Always work inside /workspace."
+          "theme": "You are a coding assistant. The project code is at /workspace. Use the coding agent tools with workdir:/workspace to read, edit, and create files. Always work inside /workspace."
         },
         "tools": {
           "profile": "coding",
@@ -34,10 +34,9 @@
       },
       {
         "id": "cursor",
-        "workspace": "/workspace",
         "identity": {
           "name": "OpenClaw",
-          "theme": "You are a coding assistant. Use Cursor CLI to read, edit, and create files in /workspace. Always work inside /workspace."
+          "theme": "You are a coding assistant. The project code is at /workspace. Use Cursor CLI to read, edit, and create files in /workspace. Always work inside /workspace."
         },
         "tools": {
           "profile": "coding",
