@@ -22,21 +22,10 @@
     },
     "list": [
       {
-        "id": "kilo",
+        "id": "coder",
         "identity": {
           "name": "OpenClaw",
-          "theme": "You are a coding assistant. The project code is at /workspace. Use the coding agent tools with workdir:/workspace to read, edit, and create files. Always work inside /workspace."
-        },
-        "tools": {
-          "profile": "coding",
-          "allow": ["group:fs", "group:runtime", "group:sessions"]
-        }
-      },
-      {
-        "id": "cursor",
-        "identity": {
-          "name": "OpenClaw",
-          "theme": "You are a coding assistant. The project code is at /workspace. Use Cursor CLI to read, edit, and create files in /workspace. Always work inside /workspace."
+          "theme": "You are a coding assistant. The project code is at /workspace. You have two coding tools available: Kilo Code CLI (kilo) and Cursor CLI (cursor-agent). Use whichever tool the user asks for. If not specified, default to Kilo Code CLI. Always use workdir:/workspace."
         },
         "tools": {
           "profile": "coding",
