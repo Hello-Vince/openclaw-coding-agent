@@ -8,19 +8,24 @@ services:
     volumes:
       - ${PROJECT_PATH:-./_project}:/workspace
       - /dev/null:/workspace/.env:ro
-      - /dev/null:/workspace/.env.local:ro
-      - /dev/null:/workspace/.env.production:ro
       - /dev/null:/workspace/src/resource/application.yaml:ro
       - /dev/null:/workspace/src/resource/.env:ro
       - openclaw-state:/home/node/.openclaw
       - ./config/openclaw.json:/home/node/.openclaw/openclaw.json:ro
+      - ./config/workspace/AGENTS.md:/home/node/.openclaw/workspace/AGENTS.md:ro
+      - ./config/workspace/TOOLS.md:/home/node/.openclaw/workspace/TOOLS.md:ro
+      - ./config/workspace/USER.md:/home/node/.openclaw/workspace/USER.md:ro
+      - ./config/workspace/SOUL.md:/home/node/.openclaw/workspace/SOUL.md:ro
+      - ./config/workspace/IDENTITY.md:/home/node/.openclaw/workspace/IDENTITY.md:ro
       - agent-data:/home/node/.local/share
+      - cursor-config:/home/node/.config
     env_file:
       - .env
     environment:
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
       - KILOCODE_API_KEY=${KILOCODE_API_KEY}
       - CURSOR_API_KEY=${CURSOR_API_KEY}
+      - XDG_CONFIG_HOME=/home/node/.config
     cap_drop:
       - ALL
     read_only: true
@@ -35,3 +40,4 @@ services:
 volumes:
   agent-data:
   openclaw-state:
+  cursor-config:
