@@ -34,19 +34,22 @@ Always run commands from `/workspace`.
 
 # Coding Tools
 
-## Kilo Code CLI (default)
+## Cursor CLI (default)
 
 ```
-bash pty:true workdir:/workspace background:true command:"kilo 'describe the task here'"
+bash pty:true workdir:/workspace background:true command:"cursor-agent --yolo --trust --workspace /workspace 'describe the task here'"
 ```
 
-## Cursor CLI
+## Kilo Code CLI
 
-Only use when the user explicitly asks for Cursor.
+Only use when the user explicitly asks for Kilo Code.
 
 ```
-bash pty:true workdir:/workspace background:true command:"cursor-agent chat 'describe the task here'"
+bash pty:true workdir:/workspace background:true command:"kilo --yolo 'describe the task here'"
 ```
+
+The `--yolo` flag auto-approves all shell commands (npm, git, etc.) so the CLI can work autonomously.
+The `--trust` flag skips workspace trust prompts in headless mode.
 
 # Restrictions
 

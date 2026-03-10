@@ -43,9 +43,29 @@ docker compose up -d --build
 
 4. **Open the Control UI**
 
-Navigate to [http://localhost:18789](http://localhost:18789). On first connection you'll need to:
-- Approve the device pairing: `docker exec openclaw-agent openclaw devices list` then `docker exec openclaw-agent openclaw devices approve <requestId>`
-- Enter your gateway token when prompted
+Navigate to [http://localhost:18789](http://localhost:18789). On first connection there are two auth steps:
+
+**Step A -- Enter your gateway token:**
+
+The UI will show "This gateway requires auth". Look for a token/password input field in the Control UI settings. Paste the `OPENCLAW_GATEWAY_TOKEN` value from your `.env` file and click Connect.
+
+**Step B -- Approve device pairing:**
+
+After entering the token, you'll see "pairing required". Open a terminal and run:
+
+```bash
+docker exec openclaw-agent openclaw devices list
+```
+
+Find the pending request ID, then approve it:
+
+```bash
+docker exec openclaw-agent openclaw devices approve <requestId>
+```
+
+Refresh the page -- you should now see the chat interface.
+
+> **Note:** Device pairing is stored in the `openclaw-state` volume. If you run `docker compose down -v` (which wipes volumes), you'll need to re-approve. A regular `docker compose restart` preserves it.
 
 5. **Send a coding task**
 
@@ -157,6 +177,51 @@ docker compose down
 # Stop and wipe all state
 docker compose down -v
 ```
+
+## Troubleshooting
+
+### "gateway token missing" / "This gateway requires auth"
+
+The Control UI needs your gateway token. Look for the settings/auth area in the UI, paste the `OPENCLAW_GATEWAY_TOKEN` value from your `.env` file, and click Connect.
+
+### "pairing required"
+
+Your browser needs approval. Run:
+
+```bash
+docker exec openclaw-agent openclaw devices list
+docker exec openclaw-agent openclaw devices approve <requestId>
+```
+
+Then refresh the page.
+
+### "too many failed authentication attempts"
+
+The rate limiter was triggered by repeated failed connections. Close the browser tab, then:
+
+```bash
+docker compose down && docker compose up -d
+```
+
+Wait a few seconds, then open [http://localhost:18789](http://localhost:18789) and enter your token.
+
+### "origin not allowed"
+
+The gateway doesn't recognize the browser's origin. Check that `gateway.controlUi.allowedOrigins` in `config/openclaw.json` includes the URL you're using (e.g., `http://localhost:18789`).
+
+### Container starts but UI won't load (connection refused)
+
+Check the logs for errors:
+
+```bash
+docker logs openclaw-agent --tail 30
+```
+
+Common causes: invalid `openclaw.json` (run `docker exec openclaw-agent openclaw doctor`), or the gateway bound to the wrong address.
+
+### Device pairing lost after restart
+
+You used `docker compose down -v` which wipes volumes (including pairing data). Use `docker compose restart` for restarts that preserve state. Only use `-v` when you need a clean slate.
 
 ## Future Expansion
 

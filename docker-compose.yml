@@ -12,6 +12,7 @@ services:
       - /dev/null:/workspace/src/resource/.env:ro
       - openclaw-state:/home/node/.openclaw
       - ./config/openclaw.json:/home/node/.openclaw/openclaw.json:ro
+      - ./config/exec-approvals.json:/home/node/.openclaw/exec-approvals.json:ro
       - ./config/workspace/AGENTS.md:/home/node/.openclaw/workspace/AGENTS.md:ro
       - ./config/workspace/TOOLS.md:/home/node/.openclaw/workspace/TOOLS.md:ro
       - ./config/workspace/USER.md:/home/node/.openclaw/workspace/USER.md:ro
@@ -19,6 +20,8 @@ services:
       - ./config/workspace/IDENTITY.md:/home/node/.openclaw/workspace/IDENTITY.md:ro
       - agent-data:/home/node/.local/share
       - cursor-config:/home/node/.config
+      - cursor-data:/home/node/.cursor
+      - kilo-state:/home/node/.local/state
     env_file:
       - .env
     environment:
@@ -32,6 +35,7 @@ services:
     tmpfs:
       - /tmp
       - /home/node/.npm
+      - /home/node/.cache
     security_opt:
       - no-new-privileges:true
     mem_limit: 3g
@@ -41,3 +45,5 @@ volumes:
   agent-data:
   openclaw-state:
   cursor-config:
+  cursor-data:
+  kilo-state:

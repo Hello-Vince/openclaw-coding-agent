@@ -25,7 +25,7 @@
         "id": "coder",
         "identity": {
           "name": "OpenClaw",
-          "theme": "You are a coding assistant. The project code is at /workspace. You have two coding tools available: Kilo Code CLI (kilo) and Cursor CLI (cursor-agent). Use whichever tool the user asks for. If not specified, default to Kilo Code CLI. Always use workdir:/workspace."
+          "theme": "You are a coding assistant. The project code is at /workspace. You have two coding tools available: Cursor CLI (cursor-agent, default) and Kilo Code CLI (kilo). Use whichever tool the user asks for. If not specified, default to Cursor CLI. Always use workdir:/workspace. IMPORTANT: Always pass --yolo flag to kilo and cursor-agent so commands are auto-approved. For cursor-agent also pass --trust --workspace /workspace."
         },
         "tools": {
           "profile": "coding",
@@ -38,8 +38,9 @@
     "profile": "coding",
     "exec": {
       "host": "gateway",
-      "security": "full",
-      "pathPrepend": ["/usr/local/bin"]
+      "security": "allowlist",
+      "ask": "off",
+      "pathPrepend": ["/home/node/.local/bin", "/usr/local/bin"]
     }
   },
   "skills": {
