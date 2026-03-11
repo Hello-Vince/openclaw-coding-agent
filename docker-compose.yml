@@ -12,7 +12,7 @@ services:
       - /dev/null:/workspace/src/resource/.env:ro
       - openclaw-state:/home/node/.openclaw
       - ./config/openclaw.json:/home/node/.openclaw/openclaw.json:ro
-      - ./config/exec-approvals.json:/home/node/.openclaw/exec-approvals.json:ro
+      - ./config/exec-approvals.json:/home/node/.openclaw/exec-approvals.json
       - ./config/workspace/AGENTS.md:/home/node/.openclaw/workspace/AGENTS.md:ro
       - ./config/workspace/TOOLS.md:/home/node/.openclaw/workspace/TOOLS.md:ro
       - ./config/workspace/USER.md:/home/node/.openclaw/workspace/USER.md:ro

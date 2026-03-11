@@ -3,8 +3,8 @@
 Run [OpenClaw](https://openclaw.ai) as a local coding agent inside Docker. Interact through the built-in Control UI in your browser, point it at a project, and let it code. You review diffs and commit from your machine.
 
 Ships with two coding tools:
-- **Kilo Code CLI** (default) -- powered by your Kilo Code account
-- **Cursor CLI** -- powered by your company's Cursor account
+- **Cursor CLI** (default) -- powered by your company's Cursor account
+- **Kilo Code CLI** -- powered by your Kilo Code account
 
 The container includes Python and Poetry so the agent can run tests and lint.
 
@@ -35,41 +35,34 @@ Edit `.env` and fill in:
 - A gateway token (generate one with `openssl rand -hex 32`)
 - The absolute path to your project
 
-3. **Build and start the container**
+3. **Start everything**
+
+```bash
+./start.sh
+```
+
+This builds the container, starts it, and:
+- Prints a **tokenized URL** that auto-authenticates your browser (no manual token paste)
+- **Auto-approves device pairing** for 90 seconds so you don't have to run approve commands
+- Opens the URL in your default browser (macOS/Linux)
+
+> **Note:** Device pairing is stored in the `openclaw-state` volume. If you run `docker compose down -v` (which wipes volumes), run `./start.sh` again. A regular `docker compose restart` preserves pairing.
+
+**Manual alternative** (if you prefer not to use the script):
 
 ```bash
 docker compose up -d --build
-```
-
-4. **Open the Control UI**
-
-Navigate to [http://localhost:18789](http://localhost:18789). On first connection there are two auth steps:
-
-**Step A -- Enter your gateway token:**
-
-The UI will show "This gateway requires auth". Look for a token/password input field in the Control UI settings. Paste the `OPENCLAW_GATEWAY_TOKEN` value from your `.env` file and click Connect.
-
-**Step B -- Approve device pairing:**
-
-After entering the token, you'll see "pairing required". Open a terminal and run:
-
-```bash
+# Get tokenized URL:
+docker exec openclaw-agent openclaw dashboard --no-open
+# Open the printed URL in your browser.
+# If you see "pairing required", approve manually:
 docker exec openclaw-agent openclaw devices list
-```
-
-Find the pending request ID, then approve it:
-
-```bash
 docker exec openclaw-agent openclaw devices approve <requestId>
 ```
 
-Refresh the page -- you should now see the chat interface.
-
-> **Note:** Device pairing is stored in the `openclaw-state` volume. If you run `docker compose down -v` (which wipes volumes), you'll need to re-approve. A regular `docker compose restart` preserves it.
-
 5. **Send a coding task**
 
-Chat with the agent. It delegates to Kilo Code CLI by default. Say "use cursor" to switch tools.
+Chat with the agent. It delegates to Cursor CLI by default. Say "use kilo" to switch tools.
 
 6. **Review and commit**
 
@@ -85,8 +78,10 @@ git add -A && git commit -m "your message"
 openclaw-coding-agent/
 ├── Dockerfile                # OpenClaw + Kilo CLI + Cursor CLI + Python + Poetry
 ├── docker-compose.yml        # Container definition with security hardening
+├── start.sh                  # One-command startup (token URL + device auto-approve)
 ├── config/
 │   ├── openclaw.json         # Agent, tools, skills, and gateway configuration
+│   ├── exec-approvals.json   # Command execution permissions
 │   └── workspace/            # Agent context files (mounted read-only)
 │       ├── AGENTS.md         # Operating rules, workflow, boundaries
 │       ├── TOOLS.md          # Environment info, available commands
@@ -151,20 +146,27 @@ Add more lines for any files containing secrets.
 - **No-new-privileges** -- blocks privilege escalation
 - **Memory limits** -- 3 GB RAM / 4 GB swap
 - **Credential masking** -- project `.env` files hidden via `/dev/null` overlay
-- **Agent rules** -- `AGENTS.md` forbids git push, file deletion without confirmation, and writing outside `/workspace`
+- **Agent rules** -- `AGENTS.md` forbids git push and writing outside `/workspace`
+- **Full exec autonomy** -- agent runs commands without prompting (safe inside the sandbox)
 
 **Always review diffs before committing.**
 
 ## Common Operations
 
 ```bash
+# Start (build + token URL + auto-approve)
+./start.sh
+
 # Rebuild after Dockerfile changes
-docker compose down -v && docker compose up -d --build
+docker compose down -v && ./start.sh
 
 # Restart (preserves state, re-reads config)
 docker compose restart
 
-# Approve new browser
+# Get tokenized URL for a new browser
+docker exec openclaw-agent openclaw dashboard --no-open
+
+# Approve new browser manually
 docker exec openclaw-agent openclaw devices list
 docker exec openclaw-agent openclaw devices approve <requestId>
 
@@ -182,11 +184,11 @@ docker compose down -v
 
 ### "gateway token missing" / "This gateway requires auth"
 
-The Control UI needs your gateway token. Look for the settings/auth area in the UI, paste the `OPENCLAW_GATEWAY_TOKEN` value from your `.env` file, and click Connect.
+Use `./start.sh` which opens a tokenized URL that auto-authenticates. If connecting manually, run `docker exec openclaw-agent openclaw dashboard --no-open` to get the URL with the token embedded.
 
 ### "pairing required"
 
-Your browser needs approval. Run:
+Your browser needs device approval. `./start.sh` auto-approves for 90 seconds after startup. If connecting later, approve manually:
 
 ```bash
 docker exec openclaw-agent openclaw devices list
@@ -203,7 +205,7 @@ The rate limiter was triggered by repeated failed connections. Close the browser
 docker compose down && docker compose up -d
 ```
 
-Wait a few seconds, then open [http://localhost:18789](http://localhost:18789) and enter your token.
+Wait a few seconds, then run `./start.sh` or use the tokenized URL from `docker exec openclaw-agent openclaw dashboard --no-open`.
 
 ### "origin not allowed"
 
@@ -221,7 +223,7 @@ Common causes: invalid `openclaw.json` (run `docker exec openclaw-agent openclaw
 
 ### Device pairing lost after restart
 
-You used `docker compose down -v` which wipes volumes (including pairing data). Use `docker compose restart` for restarts that preserve state. Only use `-v` when you need a clean slate.
+You used `docker compose down -v` which wipes volumes (including pairing data). Use `docker compose restart` for restarts that preserve state. If you need a clean slate, run `docker compose down -v && ./start.sh` to rebuild with auto-approve.
 
 ## Future Expansion
 
